@@ -252,6 +252,7 @@ const DemoVideo = () => (
       <div className="overflow-hidden rounded-2xl border border-glow shadow-glow">
         <video
           src="/prombit-demo.mp4"
+          poster="/prombit-thumbnail.png"
           controls
           playsInline
           className="w-full"
