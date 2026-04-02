@@ -1,4 +1,5 @@
 import Layout from "@/components/Layout";
+import DownloadSection from "@/components/DownloadSection";
 import Section from "@/components/Section";
 import SectionHeading from "@/components/SectionHeading";
 import { Button } from "@/components/ui/button";
@@ -222,6 +223,7 @@ const DesktopApp = () => (
     <AdvancedFeatures />
     <WorkflowExamples />
     <FutureCapabilities />
+    <DownloadSection />
     <CTASection />
   </Layout>
 );
