@@ -4,7 +4,7 @@ import SectionHeading from "@/components/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Zap, Sparkles, MousePointerClick, Chrome, Monitor, Smartphone, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Zap, Sparkles, MousePointerClick, Chrome, Monitor, Smartphone, ArrowRight, CheckCircle2, Play } from "lucide-react";
 
 const Hero = () => (
   <Section className="relative overflow-hidden pt-32 md:pt-40 pb-16 md:pb-24">
@@ -38,6 +38,26 @@ const Hero = () => (
         <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Free to start</span>
         <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> No login required</span>
         <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Works with any AI tool</span>
+      </div>
+    </div>
+  </Section>
+);
+
+const DemoVideo = () => (
+  <Section className="relative pt-0 md:pt-0">
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(217_91%_60%/0.06),transparent_50%)]" />
+    <div className="relative mx-auto max-w-4xl">
+      <div className="mb-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+        <Play className="h-4 w-4 text-primary" />
+        <span>See Prombit in action</span>
+      </div>
+      <div className="overflow-hidden rounded-2xl border border-glow shadow-glow">
+        <video
+          src="/prombit-demo.mp4"
+          controls
+          playsInline
+          className="w-full"
+        />
       </div>
     </div>
   </Section>
@@ -206,6 +226,7 @@ const CTASection = () => (
 const Index = () => (
   <Layout>
     <Hero />
+    <DemoVideo />
     <HowItWorks />
     <Benefits />
     <ProductVersions />
