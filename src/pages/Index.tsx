@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect } from "react";
 import Layout from "@/components/Layout";
 import Section from "@/components/Section";
 import SectionHeading from "@/components/SectionHeading";
@@ -9,10 +9,8 @@ import { Zap, Sparkles, MousePointerClick, Chrome, Monitor, Smartphone, ArrowRig
 
 const Hero = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cardRef   = useRef<HTMLDivElement>(null);
-  const mouseRef  = useRef({ x: -9999, y: -9999 });
 
-  /* ── Particle canvas ─────────────────────────────────────────────────── */
+  /* ── Cinematic drifting star field ───────────────────────────────────── */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -24,78 +22,55 @@ const Hero = () => {
     const ro = new ResizeObserver(setSize);
     ro.observe(canvas);
 
-    type P = { x: number; y: number; vx: number; vy: number; r: number; a: number };
-    const pts: P[] = Array.from({ length: 120 }, () => ({
-      x: Math.random() * canvas.width,  y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
-      r: Math.random() * 1.4 + 0.4,     a: Math.random() * 0.35 + 0.08,
+    type Star = { x: number; y: number; r: number; baseAlpha: number; twinkleOffset: number; blue: boolean };
+    const stars: Star[] = Array.from({ length: 250 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight * 2,
+      r: Math.random() * 1.8 + 0.2,
+      baseAlpha: Math.random() * 0.7 + 0.3,
+      twinkleOffset: Math.random() * Math.PI * 2,
+      blue: Math.random() < 0.3,
     }));
 
+    const VX = 0.09;
+    const VY = -0.06;
+    let prevScrollY = window.scrollY;
     let raf: number;
-    const tick = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const { x: mx, y: my } = mouseRef.current;
+    let t = 0;
 
-      for (const p of pts) {
-        const dx = mx - p.x, dy = my - p.y, d = Math.hypot(dx, dy);
-        if (d < 180 && d > 0) { p.vx += (dx / d) * 0.018; p.vy += (dy / d) * 0.018; }
-        p.vx *= 0.985; p.vy *= 0.985;
-        p.x = (p.x + p.vx + canvas.width)  % canvas.width;
-        p.y = (p.y + p.vy + canvas.height) % canvas.height;
+    const tick = () => {
+      t += 0.016;
+      const scrollY = window.scrollY;
+      const scrollDelta = scrollY - prevScrollY;
+      prevScrollY = scrollY;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const s of stars) {
+        s.x = (s.x + VX + canvas.width)  % canvas.width;
+        s.y = (s.y + VY + scrollDelta * 0.4 + canvas.height) % canvas.height;
+
+        const twinkle = 0.5 + 0.5 * Math.sin(t * 1.2 + s.twinkleOffset);
+        const alpha = s.baseAlpha * (0.6 + 0.4 * twinkle);
+
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(148,163,255,${p.a})`;
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = s.blue
+          ? `rgba(180,210,255,${alpha})`
+          : `rgba(255,255,255,${alpha})`;
         ctx.fill();
       }
 
-      for (let i = 0; i < pts.length; i++) {
-        for (let j = i + 1; j < pts.length; j++) {
-          const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
-          if (d < 100) {
-            ctx.beginPath();
-            ctx.moveTo(pts[i].x, pts[i].y);
-            ctx.lineTo(pts[j].x, pts[j].y);
-            ctx.strokeStyle = `rgba(148,163,255,${(1 - d / 100) * 0.07})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
       raf = requestAnimationFrame(tick);
     };
     tick();
     return () => { ro.disconnect(); cancelAnimationFrame(raf); };
   }, []);
 
-  /* ── Mouse handlers ──────────────────────────────────────────────────── */
-  const onMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    if (cardRef.current) {
-      cardRef.current.style.transition = "transform 0.08s ease-out";
-      const cr = cardRef.current.getBoundingClientRect();
-      const rx = ((e.clientY - (cr.top  + cr.height / 2)) / cr.height) * 16;
-      const ry = ((e.clientX - (cr.left + cr.width  / 2)) / cr.width)  * -16;
-      cardRef.current.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
-    }
-  }, []);
-
-  const onMouseLeave = useCallback(() => {
-    mouseRef.current = { x: -9999, y: -9999 };
-    if (cardRef.current) {
-      cardRef.current.style.transition = "transform 0.6s cubic-bezier(0.34,1.56,0.64,1)";
-      cardRef.current.style.transform  = "perspective(900px) rotateX(0deg) rotateY(0deg)";
-    }
-  }, []);
-
   /* ── Render ──────────────────────────────────────────────────────────── */
   return (
-    <section
-      className="relative overflow-hidden pt-32 md:pt-40 pb-16 md:pb-24"
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-    >
-      {/* Particle canvas */}
+    <section className="relative overflow-hidden pt-32 md:pt-40 pb-16 md:pb-24">
+      {/* Star field canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} />
 
       {/* Ambient orbs */}
@@ -109,117 +84,52 @@ const Hero = () => {
         style={{ height: 180, background: "linear-gradient(to bottom, transparent, hsl(220, 20%, 4%))", zIndex: 2 }}
       />
 
-      {/* Content */}
+      {/* Content — centered */}
       <div className="container mx-auto px-4 relative" style={{ zIndex: 3 }}>
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="mx-auto max-w-3xl text-center" style={{ perspective: "600px" }}>
 
-          {/* Left: text */}
-          <div className="text-center lg:text-left" style={{ perspective: "600px" }}>
-            <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 0.3s both", transformOrigin: "bottom center" }}>
-              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-glow bg-secondary/60 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm">
-                <Sparkles className="h-3.5 w-3.5" />
-                AI Prompt Engineering, Simplified
-              </span>
-            </div>
-
-            <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 0.5s both", transformOrigin: "bottom center" }}>
-              <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
-                Write one line.
-              </h1>
-            </div>
-
-            <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 0.7s both", transformOrigin: "bottom center" }}>
-              <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
-                <span className="text-gradient">Get the perfect prompt.</span>
-              </h1>
-            </div>
-
-            <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 0.95s both", transformOrigin: "bottom center" }}>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
-                Prombit takes your rough idea and instantly transforms it into a detailed, optimized prompt — ready for ChatGPT, Claude, Midjourney, and more.
-              </p>
-            </div>
-
-            <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 1.1s both", transformOrigin: "bottom center" }}>
-              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
-                <Link to="/contact">
-                  <Button variant="hero" size="lg" className="text-base px-8 h-12">
-                    Try Prombit <ArrowRight className="ml-1.5 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link to="/features">
-                  <Button variant="hero-outline" size="lg" className="text-base px-8 h-12">
-                    See How It Works
-                  </Button>
-                </Link>
-              </div>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground lg:justify-start">
-                <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Free to start</span>
-                <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> No login required</span>
-                <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Works with any AI tool</span>
-              </div>
-            </div>
+          <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 0.3s both", transformOrigin: "bottom center" }}>
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-glow bg-secondary/60 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm">
+              <Sparkles className="h-3.5 w-3.5" />
+              AI Prompt Engineering, Simplified
+            </span>
           </div>
 
-          {/* Right: 3D parallax card — desktop only */}
-          <div className="hidden lg:flex items-center justify-center">
-            <div
-              ref={cardRef}
-              style={{ transformStyle: "preserve-3d", transition: "transform 0.08s ease-out", animation: "hero-text-in 0.9s cubic-bezier(0.22,1,0.36,1) 0.6s both" }}
-            >
-              <div style={{
-                background: "rgba(255,255,255,0.04)",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-                border: "1px solid rgba(148,163,255,0.15)",
-                borderRadius: 24,
-                padding: 28,
-                width: 360,
-                boxShadow: "0 25px 60px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)",
-              }}>
-                {/* Window chrome */}
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 20 }}>
-                  {(["#ef4444","#f59e0b","#22c55e"] as const).map((c) => (
-                    <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c, opacity: 0.8 }} />
-                  ))}
-                  <span style={{ marginLeft: 10, fontSize: 11, color: "rgba(148,163,255,0.45)", fontFamily: "monospace" }}>
-                    prompt.enhance()
-                  </span>
-                </div>
+          <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 0.5s both", transformOrigin: "bottom center" }}>
+            <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
+              Write one line.
+            </h1>
+          </div>
 
-                {/* Input */}
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.3)", marginBottom: 8 }}>Your Input</div>
-                  <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "monospace", lineHeight: 1.5 }}>
-                    "write me a landing page"
-                  </div>
-                </div>
+          <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 0.7s both", transformOrigin: "bottom center" }}>
+            <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
+              <span className="text-gradient">Get the perfect prompt.</span>
+            </h1>
+          </div>
 
-                {/* Transform pill */}
-                <div style={{ textAlign: "center", margin: "12px 0" }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg, hsl(217, 91%, 60%), hsl(190, 95%, 50%))", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 600, color: "white" }}>
-                    ✦ Prombit enhanced
-                  </span>
-                </div>
+          <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 0.95s both", transformOrigin: "bottom center" }}>
+            <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
+              Prombit takes your rough idea and instantly transforms it into a detailed, optimized prompt — ready for ChatGPT, Claude, Midjourney, and more.
+            </p>
+          </div>
 
-                {/* Output */}
-                <div>
-                  <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(148,163,255,0.6)", marginBottom: 8 }}>Optimized Prompt</div>
-                  <div style={{ background: "rgba(94,114,255,0.07)", border: "1px solid rgba(148,163,255,0.15)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "rgba(255,255,255,0.75)", fontFamily: "monospace", lineHeight: 1.65 }}>
-                    "Write a modern, conversion-focused landing page for a SaaS product. Include a hero with clear value proposition, 3-step how it works, benefit cards with icons, and a strong CTA..."
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-                  {[["⚡","Instant"],["🎯","Optimized"],["✓","AI-ready"]].map(([icon, label]) => (
-                    <div key={label} style={{ flex: 1, textAlign: "center", background: "rgba(148,163,255,0.05)", border: "1px solid rgba(148,163,255,0.1)", borderRadius: 10, padding: "8px 0", fontSize: 11, color: "rgba(148,163,255,0.65)" }}>
-                      <div style={{ marginBottom: 2 }}>{icon}</div>
-                      <div>{label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 1.1s both", transformOrigin: "bottom center" }}>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link to="/contact">
+                <Button variant="hero" size="lg" className="text-base px-8 h-12">
+                  Try Prombit <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/features">
+                <Button variant="hero-outline" size="lg" className="text-base px-8 h-12">
+                  See How It Works
+                </Button>
+              </Link>
+            </div>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Free to start</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> No login required</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Works with any AI tool</span>
             </div>
           </div>
 
