@@ -8,21 +8,45 @@ import { Zap, Sparkles, MousePointerClick, Chrome, Monitor, Smartphone, ArrowRig
 
 const Hero = () => (
   <Section className="relative overflow-hidden pt-32 md:pt-40 pb-16 md:pb-24">
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(217_91%_60%/0.1),transparent_50%)]" />
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(circle,hsl(190_95%_50%/0.04),transparent_60%)]" />
+    {/* Background gradients */}
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(217_91%_60%/0.12),transparent_55%)] animate-pulse-glow" />
+
+    {/* Floating orbs */}
+    <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,hsl(217_91%_60%/0.08),transparent_70%)] blur-2xl animate-float" />
+    <div className="pointer-events-none absolute -bottom-16 -right-16 h-80 w-80 rounded-full bg-[radial-gradient(circle,hsl(190_95%_50%/0.07),transparent_70%)] blur-2xl animate-float-reverse" />
+    <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,hsl(217_91%_60%/0.04),transparent_60%)] blur-3xl animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+
     <div className="relative mx-auto max-w-4xl text-center">
-      <span className="mb-8 inline-flex items-center gap-2 rounded-full border border-glow bg-secondary/60 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm">
-        <Sparkles className="h-3.5 w-3.5" />
-        AI Prompt Engineering, Simplified
-      </span>
-      <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
+      {/* Badge — entrance delay 0ms */}
+      <div className="opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
+        <span className="mb-8 inline-flex items-center gap-2 rounded-full border border-glow bg-secondary/60 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm">
+          <Sparkles className="h-3.5 w-3.5" />
+          AI Prompt Engineering, Simplified
+        </span>
+      </div>
+
+      {/* Headline — delay 150ms */}
+      <h1
+        className="mt-6 text-4xl font-extrabold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl opacity-0 animate-fade-in"
+        style={{ animationDelay: "150ms" }}
+      >
         Write one line.{" "}
         <span className="text-gradient">Get the perfect prompt.</span>
       </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+
+      {/* Subtext — delay 300ms */}
+      <p
+        className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl opacity-0 animate-fade-in"
+        style={{ animationDelay: "300ms" }}
+      >
         Prombit takes your rough idea and instantly transforms it into a detailed, optimized prompt — ready for ChatGPT, Claude, Midjourney, and more.
       </p>
-      <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+
+      {/* Buttons — delay 450ms */}
+      <div
+        className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row opacity-0 animate-scale-in"
+        style={{ animationDelay: "450ms" }}
+      >
         <Link to="/contact">
           <Button variant="hero" size="lg" className="text-base px-8 h-12">
             Try Prombit <ArrowRight className="ml-1.5 h-4 w-4" />
@@ -34,7 +58,12 @@ const Hero = () => (
           </Button>
         </Link>
       </div>
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+
+      {/* Trust badges — delay 600ms */}
+      <div
+        className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground opacity-0 animate-fade-in"
+        style={{ animationDelay: "600ms" }}
+      >
         <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Free to start</span>
         <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> No login required</span>
         <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Works with any AI tool</span>
