@@ -208,7 +208,7 @@ const CTASection = () => (
             <Chrome className="mr-2 h-5 w-5" /> Install Chrome Extension <ArrowRight className="ml-1.5 h-4 w-4" />
           </Button>
         </div>
-        <p className="mt-4 text-sm text-muted-foreground">Free forever on the Starter plan. No credit card required.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Completely free. No account or credit card required.</p>
       </div>
     </div>
   </Section>

@@ -19,8 +19,21 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="text-xl font-bold text-gradient">
-          Prombit
+        <Link 
+          to="/" 
+          className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
+        >
+          <img 
+            src="/logo.png" 
+            alt="Prombit Logo" 
+            className="h-8 w-8 object-contain"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+          <span className="text-xl font-bold tracking-tight text-gradient">
+            Prombit
+          </span>
         </Link>
 
         {/* Desktop */}

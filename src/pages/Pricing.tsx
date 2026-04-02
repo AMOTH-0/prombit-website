@@ -3,7 +3,7 @@ import Section from "@/components/Section";
 import SectionHeading from "@/components/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Check } from "lucide-react";
+import { Check, Chrome } from "lucide-react";
 
 const plans = [
   {
@@ -11,7 +11,7 @@ const plans = [
     price: "$0",
     period: "forever",
     description: "Get started with basic prompt enhancement.",
-    features: ["10 prompt enhancements/day", "Works with ChatGPT & Claude", "Chrome Extension access", "Community support"],
+    features: ["10 prompt enhancements/day", "Works with ChatGPT & Claude", "Community support"],
     cta: "Get Started Free",
     featured: false,
   },
@@ -39,6 +39,15 @@ const Pricing = () => (
   <Layout>
     <Section>
       <SectionHeading badge="Pricing" title="Simple, transparent pricing" description="Start free, upgrade when you need more power." />
+
+      {/* Chrome Extension free callout */}
+      <div className="mb-10 flex items-center justify-center gap-3 rounded-2xl border border-glow bg-gradient-card px-6 py-4 text-center shadow-glow">
+        <Chrome className="h-5 w-5 shrink-0 text-primary" />
+        <p className="text-sm font-medium text-foreground">
+          <span className="text-primary font-semibold">Chrome Extension is completely free</span> — no plan, no account, no credit card required. Ever.
+        </p>
+      </div>
+
       <div className="grid gap-8 md:grid-cols-3">
         {plans.map((plan, i) => (
           <div

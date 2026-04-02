@@ -8,7 +8,8 @@ const faqs = [
   { q: "How does Prombit improve my prompts?", a: "Prombit analyzes your input, adds relevant context, restructures your request, and applies prompt engineering best practices — all automatically." },
   { q: "Which AI tools does Prombit work with?", a: "Prombit works with all major AI tools including ChatGPT, Claude, Midjourney, DALL-E, Stable Diffusion, Gemini, and more." },
   { q: "Is my data private?", a: "Yes. Prombit is privacy-first. Your prompts are processed locally when possible, and we never store your data without your explicit consent." },
-  { q: "Is there a free plan?", a: "Yes! Prombit offers a generous free tier with 10 prompt enhancements per day. Upgrade to Pro for unlimited access." },
+  { q: "Is the Chrome extension free?", a: "Yes — completely free, forever. No account, no credit card, no daily limits. Just install and use it." },
+  { q: "Is there a free plan for other versions?", a: "Yes! Prombit offers a free tier for desktop and mobile with 10 prompt enhancements per day. Upgrade to Pro for unlimited access." },
   { q: "Can I use Prombit on mobile?", a: "Yes. Prombit is available as a Chrome extension, desktop app (macOS & Windows), and mobile app (iOS & Android)." },
   { q: "How is Prombit different from writing prompts myself?", a: "Prombit applies proven prompt engineering techniques automatically — adding context, structure, and specificity that dramatically improve AI output quality." },
 ];

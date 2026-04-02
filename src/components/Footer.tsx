@@ -5,7 +5,17 @@ const Footer = () => (
     <div className="container mx-auto px-4">
       <div className="grid gap-8 md:grid-cols-4">
         <div>
-          <h3 className="mb-4 text-lg font-bold text-gradient">Prombit</h3>
+          <Link to="/" className="group mb-4 flex items-center gap-2.5 transition-opacity hover:opacity-90 w-fit">
+            <img 
+              src="/logo.png" 
+              alt="Prombit Logo" 
+              className="h-8 w-8 object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <h3 className="text-lg font-bold tracking-tight text-gradient">Prombit</h3>
+          </Link>
           <p className="text-sm text-muted-foreground">
             Transform vague ideas into powerful AI prompts. Works with ChatGPT, Claude, Midjourney, and more.
           </p>
