@@ -1,7 +1,7 @@
 import Layout from "@/components/Layout";
 import Section from "@/components/Section";
 import SectionHeading from "@/components/SectionHeading";
-import { Wand2, Languages, Layers, Lightbulb, Repeat, Shield } from "lucide-react";
+import { Wand2, Languages, Layers, Lightbulb, Repeat, Shield, Play } from "lucide-react";
 
 const features = [
   { icon: Wand2, title: "Smart Prompt Enhancement", description: "Automatically restructures and enriches your rough ideas into detailed, effective prompts." },
@@ -26,6 +26,25 @@ const Features = () => (
             <p className="text-muted-foreground">{f.description}</p>
           </div>
         ))}
+      </div>
+    </Section>
+
+    <Section className="relative pt-0 md:pt-0">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(217_91%_60%/0.06),transparent_50%)]" />
+      <div className="relative mx-auto max-w-4xl">
+        <div className="mb-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <Play className="h-4 w-4 text-primary" />
+          <span>See Prombit in action</span>
+        </div>
+        <div className="overflow-hidden rounded-2xl border border-glow shadow-glow">
+          <video
+            src="/prombit-demo.mp4"
+            poster="/prombit-thumbnail.png"
+            controls
+            playsInline
+            className="w-full"
+          />
+        </div>
       </div>
     </Section>
   </Layout>
