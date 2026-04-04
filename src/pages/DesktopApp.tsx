@@ -217,40 +217,6 @@ const Privacy = () => (
   </Section>
 );
 
-const BuildOrder = () => {
-  const steps = [
-    { n: "01", label: "Electron app skeleton", desc: "System tray, starts on boot, stays in background" },
-    { n: "02", label: "Clipboard watcher", desc: "Detects new images, shows 'Generate prompt?' popup" },
-    { n: "03", label: "Annotation-to-prompt", desc: "Send image to vision API, display and copy generated prompt" },
-    { n: "04", label: "UI Automation hook", desc: "Capture submitted prompts from any app via Windows Accessibility API" },
-    { n: "05", label: "Project classifier", desc: "Local model filters project vs personal prompts on-device" },
-    { n: "06", label: "Project clustering", desc: "Group prompts into projects automatically by content" },
-    { n: "07", label: "Context rot prevention", desc: "Decision log, rejection tagging, recency weighting" },
-    { n: "08", label: "Continuation prompt", desc: "Assemble project context into a structured handoff block" },
-    { n: "09", label: "Memory UI", desc: "View projects, history, pinned decisions, current state" },
-    { n: "10", label: "Polish", desc: "Multi-monitor, settings panel, tool-specific prompt formatting" },
-  ];
-
-  return (
-    <Section className="relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(217_91%_60%/0.04),transparent_60%)]" />
-      <div className="relative">
-        <SectionHeading badge="Build Roadmap" title="Built in public, step by step" description="Each step is independently useful and testable. We ship value at every stage." />
-        <div className="mx-auto max-w-3xl space-y-3">
-          {steps.map((s) => (
-            <div key={s.n} className="flex items-center gap-5 rounded-xl border border-border bg-card px-6 py-4 transition-all hover:border-glow">
-              <span className="text-2xl font-extrabold tabular-nums text-primary/30">{s.n}</span>
-              <div>
-                <p className="font-semibold text-foreground">{s.label}</p>
-                <p className="text-sm text-muted-foreground">{s.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
-};
 
 const CTASection = () => (
   <Section>
@@ -288,7 +254,6 @@ const DesktopApp = () => (
     <FeatureAnnotation />
     <FeatureMemory />
     <Privacy />
-    <BuildOrder />
     <DownloadSection />
     <CTASection />
   </Layout>
