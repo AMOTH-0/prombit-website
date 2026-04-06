@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import * as THREE from "three";
 import Layout from "@/components/Layout";
 import Section from "@/components/Section";
 import SectionHeading from "@/components/SectionHeading";
@@ -8,70 +9,183 @@ import { Link } from "react-router-dom";
 import { Zap, Sparkles, MousePointerClick, Chrome, Monitor, Smartphone, ArrowRight, CheckCircle2, Play } from "lucide-react";
 
 const Hero = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mountRef = useRef<HTMLDivElement>(null);
 
-  /* ── Cinematic drifting star field ───────────────────────────────────── */
+  /* ── Three.js 3D interactive scene ──────────────────────────────────── */
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const mount = mountRef.current;
+    if (!mount) return;
 
-    const setSize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
-    setSize();
-    const ro = new ResizeObserver(setSize);
-    ro.observe(canvas);
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, mount.clientWidth / mount.clientHeight, 0.1, 100);
+    camera.position.set(0, 0, 5);
 
-    type Star = { x: number; y: number; r: number; baseAlpha: number; twinkleOffset: number; blue: boolean };
-    const stars: Star[] = Array.from({ length: 250 }, () => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight * 2,
-      r: Math.random() * 1.8 + 0.2,
-      baseAlpha: Math.random() * 0.7 + 0.3,
-      twinkleOffset: Math.random() * Math.PI * 2,
-      blue: Math.random() < 0.3,
-    }));
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(mount.clientWidth, mount.clientHeight);
+    renderer.setClearColor(0x000000, 0);
+    mount.appendChild(renderer.domElement);
 
-    const VX = 0.09;
-    const VY = -0.06;
-    let prevScrollY = window.scrollY;
+    // ── Outer icosahedron wireframe ──────────────────────────────────────
+    const icoGeo = new THREE.IcosahedronGeometry(1.5, 1);
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0x4f8ef7,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.25,
+    });
+    const icoWire = new THREE.Mesh(icoGeo, wireMat);
+    scene.add(icoWire);
+
+    // ── Inner solid icosahedron (slightly glowing) ───────────────────────
+    const innerGeo = new THREE.IcosahedronGeometry(1.18, 1);
+    const innerMat = new THREE.MeshStandardMaterial({
+      color: 0x0f172a,
+      emissive: new THREE.Color(0x1e40af),
+      emissiveIntensity: 0.35,
+      transparent: true,
+      opacity: 0.72,
+      roughness: 0.4,
+      metalness: 0.6,
+    });
+    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+    scene.add(innerMesh);
+
+    // ── Vertex node dots ─────────────────────────────────────────────────
+    const posAttr = icoGeo.attributes.position;
+    const dotGeo = new THREE.SphereGeometry(0.035, 8, 8);
+    const dotMat = new THREE.MeshBasicMaterial({ color: 0x60a5fa });
+    const visited = new Set<string>();
+    for (let i = 0; i < posAttr.count; i++) {
+      const x = +posAttr.getX(i).toFixed(4);
+      const y = +posAttr.getY(i).toFixed(4);
+      const z = +posAttr.getZ(i).toFixed(4);
+      const key = `${x},${y},${z}`;
+      if (visited.has(key)) continue;
+      visited.add(key);
+      const dot = new THREE.Mesh(dotGeo, dotMat);
+      dot.position.set(x, y, z);
+      icoWire.add(dot);
+    }
+
+    // ── Ambient + directional lights ─────────────────────────────────────
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0x60a5fa, 2.5);
+    dirLight.position.set(3, 4, 5);
+    scene.add(dirLight);
+    const rimLight = new THREE.DirectionalLight(0x818cf8, 1.2);
+    rimLight.position.set(-3, -2, -4);
+    scene.add(rimLight);
+
+    // ── Orbit ring ───────────────────────────────────────────────────────
+    const ringGeo = new THREE.TorusGeometry(2.1, 0.008, 6, 120);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.18 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 3;
+    scene.add(ring);
+
+    const ring2 = new THREE.Mesh(
+      new THREE.TorusGeometry(2.5, 0.006, 6, 120),
+      new THREE.MeshBasicMaterial({ color: 0x818cf8, transparent: true, opacity: 0.1 })
+    );
+    ring2.rotation.x = -Math.PI / 5;
+    ring2.rotation.y = Math.PI / 6;
+    scene.add(ring2);
+
+    // ── Mouse tracking ───────────────────────────────────────────────────
+    const targetRot = { x: 0, y: 0 };
+    const currentRot = { x: 0, y: 0 };
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = mount.getBoundingClientRect();
+      const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      targetRot.y = nx * 0.6;
+      targetRot.x = -ny * 0.35;
+    };
+    window.addEventListener("mousemove", onMouseMove);
+
+    // ── Scroll parallax ──────────────────────────────────────────────────
+    let scrollY = window.scrollY;
+    const onScroll = () => { scrollY = window.scrollY; };
+    window.addEventListener("scroll", onScroll);
+
+    // ── Resize handler ───────────────────────────────────────────────────
+    const onResize = () => {
+      if (!mount) return;
+      camera.aspect = mount.clientWidth / mount.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(mount.clientWidth, mount.clientHeight);
+    };
+    window.addEventListener("resize", onResize);
+
+    // ── Animation loop ───────────────────────────────────────────────────
     let raf: number;
     let t = 0;
-
     const tick = () => {
-      t += 0.016;
-      const scrollY = window.scrollY;
-      const scrollDelta = scrollY - prevScrollY;
-      prevScrollY = scrollY;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      for (const s of stars) {
-        s.x = (s.x + VX + canvas.width)  % canvas.width;
-        s.y = (s.y + VY + scrollDelta * 0.4 + canvas.height) % canvas.height;
-
-        const twinkle = 0.5 + 0.5 * Math.sin(t * 1.2 + s.twinkleOffset);
-        const alpha = s.baseAlpha * (0.6 + 0.4 * twinkle);
-
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = s.blue
-          ? `rgba(180,210,255,${alpha})`
-          : `rgba(255,255,255,${alpha})`;
-        ctx.fill();
-      }
-
+      t += 0.008;
       raf = requestAnimationFrame(tick);
+
+      // Smooth mouse follow
+      currentRot.x += (targetRot.x - currentRot.x) * 0.05;
+      currentRot.y += (targetRot.y - currentRot.y) * 0.05;
+
+      // Scroll: move object right and slightly scale down as user scrolls
+      const scrollFrac = Math.min(scrollY / 600, 1);
+
+      // Auto-rotate + mouse tilt
+      icoWire.rotation.y = t * 0.4 + currentRot.y;
+      icoWire.rotation.x = Math.sin(t * 0.3) * 0.15 + currentRot.x;
+      innerMesh.rotation.y = -t * 0.25 + currentRot.y * 0.8;
+      innerMesh.rotation.x = icoWire.rotation.x;
+      ring.rotation.z = t * 0.2;
+      ring2.rotation.z = -t * 0.15;
+
+      // Scroll parallax: float upward + shift right
+      icoWire.position.y = -scrollFrac * 1.2 + Math.sin(t * 0.6) * 0.06;
+      innerMesh.position.y = icoWire.position.y;
+      ring.position.y = icoWire.position.y;
+      ring2.position.y = icoWire.position.y;
+
+      icoWire.position.x = scrollFrac * 1.5;
+      innerMesh.position.x = icoWire.position.x;
+      ring.position.x = icoWire.position.x;
+      ring2.position.x = icoWire.position.x;
+
+      const s = 1 - scrollFrac * 0.3;
+      icoWire.scale.setScalar(s);
+      innerMesh.scale.setScalar(s);
+      ring.scale.setScalar(s);
+      ring2.scale.setScalar(s);
+
+      // Emissive pulse
+      (innerMesh.material as THREE.MeshStandardMaterial).emissiveIntensity =
+        0.3 + 0.15 * Math.sin(t * 1.4);
+
+      renderer.render(scene, camera);
     };
     tick();
-    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      renderer.dispose();
+      if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
+    };
   }, []);
 
   /* ── Render ──────────────────────────────────────────────────────────── */
   return (
     <section className="relative overflow-hidden pt-32 md:pt-40 pb-16 md:pb-24">
-      {/* Star field canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} />
+      {/* Three.js 3D scene */}
+      <div
+        ref={mountRef}
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{ zIndex: 0 }}
+      />
 
       {/* Ambient orbs */}
       <div className="hero-orb-1" />
