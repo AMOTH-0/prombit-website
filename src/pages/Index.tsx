@@ -229,11 +229,11 @@ const Hero = () => {
 
           <div style={{ animation: "hero-text-in 0.8s cubic-bezier(0.22,1,0.36,1) 1.1s both", transformOrigin: "bottom center" }}>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link to="/contact">
-                <Button variant="hero" size="lg" className="text-base px-8 h-12">
+              <Button asChild variant="hero" size="lg" className="text-base px-8 h-12">
+                <a href="https://chromewebstore.google.com/detail/prombit/ejaefjinpoafonidefiekeciagicpcae" target="_blank" rel="noopener noreferrer">
                   Try Prombit <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Button>
-              </Link>
+                </a>
+              </Button>
               <Link to="/features">
                 <Button variant="hero-outline" size="lg" className="text-base px-8 h-12">
                   See How It Works
@@ -342,7 +342,8 @@ const ProductVersions = () => {
       title: "Chrome Extension",
       description: "Works right inside your browser. Enhance prompts without leaving ChatGPT, Claude, or any AI tool.",
       cta: "Install Extension",
-      link: "/chrome-extension",
+      link: "https://chromewebstore.google.com/detail/prombit/ejaefjinpoafonidefiekeciagicpcae",
+      external: true,
       available: true,
     },
     {
@@ -393,14 +394,15 @@ const ProductVersions = () => {
               </div>
               <h3 className="mb-3 text-xl font-bold">{p.title}</h3>
               <p className="mb-8 flex-1 text-muted-foreground leading-relaxed">{p.description}</p>
-              <Link to={p.link}>
-                <Button
-                  variant={p.available ? "hero" : "hero-outline"}
-                  className="w-full"
-                >
-                  {p.cta}
+              {p.external ? (
+                <Button asChild variant={p.available ? "hero" : "hero-outline"} className="w-full">
+                  <a href={p.link} target="_blank" rel="noopener noreferrer">{p.cta}</a>
                 </Button>
-              </Link>
+              ) : (
+                <Button asChild variant={p.available ? "hero" : "hero-outline"} className="w-full">
+                  <Link to={p.link}>{p.cta}</Link>
+                </Button>
+              )}
             </div>
           ))}
         </div>

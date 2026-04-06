@@ -31,8 +31,10 @@ const Hero = () => (
         Prombit works directly inside ChatGPT, Claude, and your favorite AI tools. One click transforms your rough input into an optimized, detailed prompt.
       </p>
       <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-        <Button variant="hero" size="lg" className="text-base px-8 h-12">
-          <Chrome className="mr-2 h-5 w-5" /> Install Chrome Extension
+        <Button asChild variant="hero" size="lg" className="text-base px-8 h-12">
+          <a href="https://chromewebstore.google.com/detail/prombit/ejaefjinpoafonidefiekeciagicpcae" target="_blank" rel="noopener noreferrer">
+            <Chrome className="mr-2 h-5 w-5" /> Install Chrome Extension
+          </a>
         </Button>
         <a href="#how-it-works">
           <Button variant="hero-outline" size="lg" className="text-base px-8 h-12">
@@ -204,8 +206,10 @@ const CTASection = () => (
           Install the free Chrome extension and get better AI results starting today.
         </p>
         <div className="mt-10">
-          <Button variant="hero" size="lg" className="text-base px-8 h-12">
-            <Chrome className="mr-2 h-5 w-5" /> Install Chrome Extension <ArrowRight className="ml-1.5 h-4 w-4" />
+          <Button asChild variant="hero" size="lg" className="text-base px-8 h-12">
+            <a href="https://chromewebstore.google.com/detail/prombit/ejaefjinpoafonidefiekeciagicpcae" target="_blank" rel="noopener noreferrer">
+              <Chrome className="mr-2 h-5 w-5" /> Install Chrome Extension <ArrowRight className="ml-1.5 h-4 w-4" />
+            </a>
           </Button>
         </div>
         <p className="mt-4 text-sm text-muted-foreground">Completely free. No account or credit card required.</p>
