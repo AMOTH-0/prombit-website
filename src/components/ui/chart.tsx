@@ -61,30 +61,31 @@ ChartContainer.displayName = "Chart";
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([_, config]) => config.theme || config.color);
 
-  if (!colorConfig.length) {
-    return null;
-  }
+  React.useEffect(() => {
+    if (!colorConfig.length) return;
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join("\n")}
-}
-`,
-          )
-          .join("\n"),
-      }}
-    />
-  );
+    const css = Object.entries(THEMES)
+      .map(([theme, prefix]) => {
+        const vars = colorConfig
+          .map(([key, itemConfig]) => {
+            const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+            return color ? `  --color-${key}: ${color};` : null;
+          })
+          .filter(Boolean)
+          .join("\n");
+        return `${prefix} [data-chart=${id}] {\n${vars}\n}`;
+      })
+      .join("\n");
+
+    const style = document.createElement("style");
+    style.setAttribute("data-chart-id", id);
+    style.textContent = css;
+    document.head.appendChild(style);
+
+    return () => style.remove();
+  }, [id, colorConfig.map(([k]) => k).join(",")]);
+
+  return null;
 };
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
