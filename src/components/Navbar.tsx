@@ -9,6 +9,7 @@ const navItems = [
   { label: "Desktop App", path: "/desktop-app" },
   { label: "Mobile App", path: "/mobile-app" },
   { label: "Pricing", path: "/pricing" },
+  { label: "Prompt Guide", path: "/prompt-guide" },
   { label: "FAQ", path: "/faq" },
 ];
 

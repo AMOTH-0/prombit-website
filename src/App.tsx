@@ -13,6 +13,9 @@ import Pricing from "./pages/Pricing.tsx";
 import FAQ from "./pages/FAQ.tsx";
 import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import PromptGuide from "./pages/PromptGuide.tsx";
+import WhatIsPromptEngineering from "./pages/posts/WhatIsPromptEngineering.tsx";
+import WhatIsContextEngineering from "./pages/posts/WhatIsContextEngineering.tsx";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +41,9 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/prompt-guide" element={<PromptGuide />} />
+          <Route path="/prompt-guide/what-is-prompt-engineering" element={<WhatIsPromptEngineering />} />
+          <Route path="/prompt-guide/what-is-context-engineering" element={<WhatIsContextEngineering />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

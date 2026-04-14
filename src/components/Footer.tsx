@@ -37,8 +37,10 @@ const Footer = () => (
           </div>
         </div>
         <div>
-          <h4 className="mb-3 text-sm font-semibold text-foreground">Company</h4>
+          <h4 className="mb-3 text-sm font-semibold text-foreground">Resources</h4>
           <div className="flex flex-col gap-2">
+            <Link to="/prompt-guide" className="text-sm text-muted-foreground hover:text-foreground transition-colors">AI Prompt Guide</Link>
+            <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">FAQ</Link>
             <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
             <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Join Waitlist</Link>
           </div>
