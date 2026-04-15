@@ -52,9 +52,8 @@ const Pricing = () => (
         {plans.map((plan, i) => (
           <div
             key={i}
-            className={`flex flex-col rounded-xl border p-8 transition-all hover:shadow-glow ${
-              plan.featured ? "border-glow bg-gradient-card shadow-glow" : "border-border bg-card"
-            }`}
+            className={`flex flex-col rounded-xl border p-8 transition-all hover:shadow-glow ${plan.featured ? "border-glow bg-gradient-card shadow-glow" : "border-border bg-card"
+              }`}
           >
             {plan.featured && (
               <span className="mb-4 w-fit rounded-full bg-gradient-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
